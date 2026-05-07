@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QuickBlur</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #fff;
+      color: #1a1a1a;
+    }
+
+    /* ── Header ─────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      padding: 18px 20px 16px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .header-icon { flex-shrink: 0; }
+
+    .header-text h1 {
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      line-height: 1.15;
+    }
+
+    .header-text p {
+      font-size: 11px;
+      opacity: 0.82;
+      margin-top: 2px;
+    }
+
+    /* ── Stats ──────────────────────────────────────── */
+    .stats {
+      display: flex;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .stat {
+      flex: 1;
+      padding: 14px 12px;
+      text-align: center;
+    }
+
+    .stat + .stat { border-left: 1px solid #e2e8f0; }
+
+    .stat-number {
+      display: block;
+      font-size: 32px;
+      font-weight: 700;
+      color: #0ea5e9;
+      line-height: 1;
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-top: 3px;
+    }
+
+    /* ── Buttons ────────────────────────────────────── */
+    .actions {
+      padding: 14px 16px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 11px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(14, 165, 233, 0.28);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.42);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #f0f9ff;
+      color: #0369a1;
+      border: 1px solid #e2e8f0;
+    }
+
+    .btn-secondary:hover {
+      background: #e0f2fe;
+      transform: translateY(-1px);
+    }
+
+    .btn:active { transform: translateY(0) !important; }
+
+    /* ── Status message ─────────────────────────────── */
+    .status-area {
+      padding: 0 16px 6px;
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .status-msg {
+      display: none;
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .status-msg.show   { display: block; }
+    .status-msg.success { background: #d1fae5; color: #065f46; }
+    .status-msg.info    { background: #e0f2fe; color: #0c4a6e; }
+    .status-msg.error   { background: #fee2e2; color: #7f1d1d; }
+
+    /* ── Legend ─────────────────────────────────────── */
+    .legend {
+      padding: 4px 16px 10px;
+    }
+
+    .legend-title {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: #c0c0cc;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin-bottom: 6px;
+    }
+
+    .legend-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .tag {
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+
+    /* ── Detection type toggles ─────────────────────── */
+    .detection-types {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px 10px;
+      padding: 10px 16px 12px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .detection-types-label {
+      grid-column: 1 / -1;
+      font-size: 9.5px;
+      font-weight: 700;
+      color: #c0c0cc;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin-bottom: 1px;
+    }
+
+    .detection-type-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .detection-type-item input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+      accent-color: #0ea5e9;
+      flex-shrink: 0;
+    }
+
+    .detection-type-item label {
+      font-size: 12px;
+      color: #444;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* ── Footer ─────────────────────────────────────── */
+    .footer {
+      padding: 8px 16px 10px;
+      text-align: center;
+      font-size: 11px;
+      color: #bbb;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-icon">
+      <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="38" height="38" rx="9" fill="rgba(255,255,255,0.15)"/>
+        <path d="M19 7L9 11.8V19.5C9 24.9 13.5 30.0 19 31.5C24.5 30.0 29 24.9 29 19.5V11.8L19 7Z"
+              fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M14.5 19.5L17.5 22.5L23.5 16.5"
+              stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>QuickBlur</h1>
+      <p>Privacy shield for screen sharing</p>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-number" id="detected">—</span>
+      <span class="stat-label">Detected</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number" id="blurred">—</span>
+      <span class="stat-label">Blurred</span>
+    </div>
+  </div>
+
+  <div class="detection-types">
+    <span class="detection-types-label">Detect types</span>
+    <div class="detection-type-item">
+      <input type="checkbox" id="detect-emails" checked>
+      <label for="detect-emails">Emails</label>
+    </div>
+    <div class="detection-type-item">
+      <input type="checkbox" id="detect-apikeys" checked>
+      <label for="detect-apikeys">API Keys</label>
+    </div>
+    <div class="detection-type-item">
+      <input type="checkbox" id="detect-cards" checked>
+      <label for="detect-cards">Cards</label>
+    </div>
+    <div class="detection-type-item">
+      <input type="checkbox" id="detect-phones" checked>
+      <label for="detect-phones">Phones</label>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="blurAll">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8
+                 a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4
+                 c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+        <line x1="1" y1="1" x2="23" y2="23"/>
+      </svg>
+      Blur Everything
+    </button>
+    <button class="btn btn-secondary" id="unblurAll">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+      Unblur All
+    </button>
+    <button class="btn btn-secondary" id="rescanBtn" style="font-size: 12px; padding: 9px 16px;">
+      &#x1F504; Rescan Page
+    </button>
+  </div>
+
+  <div class="status-area">
+    <span class="status-msg" id="status"></span>
+  </div>
+
+  <div class="legend">
+    <div class="legend-title">Detecting</div>
+    <div class="legend-tags">
+      <span class="tag" style="background:#e0f2fe;color:#0369a1">Emails</span>
+      <span class="tag" style="background:#fee2e2;color:#b91c1c">API Keys</span>
+      <span class="tag" style="background:#fef3c7;color:#92400e">Cards</span>
+      <span class="tag" style="background:#f0f9ff;color:#0284c7">Phones</span>
+      <span class="tag" style="background:#dbeafe;color:#1e40af">IPs</span>
+      <span class="tag" style="background:#fee2e2;color:#b91c1c">SSNs</span>
+      <span class="tag" style="background:#e0f2fe;color:#075985">JWTs</span>
+      <span class="tag" style="background:#fee2e2;color:#b91c1c">Passwords</span>
+    </div>
+  </div>
+
+  <div class="footer">Click any highlighted item to toggle blur individually</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

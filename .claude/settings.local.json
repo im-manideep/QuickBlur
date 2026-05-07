@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "C:\\Users\\manim\\Desktop\\Projects\\QuickBlur"
+    ],
+    "allow": [
+      "PowerShell(Get-ChildItem -Recurse \"C:\\\\Users\\\\manim\\\\Desktop\\\\Projects\\\\QuickBlur\" | Where-Object { -not $_.PSIsContainer } | Select-Object FullName, Length)"
+    ]
+  }
+}
